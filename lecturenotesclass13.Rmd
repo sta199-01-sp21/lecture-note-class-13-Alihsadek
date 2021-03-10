@@ -240,7 +240,7 @@ any other parameter), we need to come up with a plausible range of values around
 
 To ensure reproducibility for your knitted document, set the random number
 generation seed.
-
+mm
 ```{r set_seed}
 set.seed(1902370)
 ```
@@ -353,7 +353,7 @@ boot_medians <- manhattan %>%
 
 ### A confidence interval for the population proportion - $p$
 
-Consider the mice radiation dataset. Suppose we want to compute a 95% confidence interval for the proportion of mice that died while not on the treatment,regardless of the dose.
+Consider the mice radiation dataset. Suppose we want to compute a 95% confidence interval for the proportion of mice that died while on the treatment,regardless of the dose.
 
 First, identify the following:
 
@@ -392,26 +392,29 @@ Consider the mice radiation results. Suppose we want to compute a 90% confidence
 
 ```{r practice_2_bootstrap}
 boot_prop <- mice %>% 
-  filter(treat == 0) %>% 
-  mutate(died = if_else(died == 1, "yes", "no")) %>% 
-  specify(response = died, success = "yes") %>% 
+  filter(treat == 1) %>% 
+  mutate(died = if_else(died == 0, "yes", "no")) %>% 
+  specify(response = died, success = "no") %>% 
   generate(reps = 10000, type = "bootstrap") %>% 
   calculate(stat = "prop")
 ```
 
 ```{r practice_2_ci}
-
+ci_mice_lived <- get_ci(boot_prop, level = .95)
+ci_mice_lived
 ```
 
 Visualizing our Resuts:
 
 ```{r practice_2_visualize}
-
+visualise(boot_prop) +
+  shade_ci(ci_mice_lived)
 ```
 
 
 Give an interpretation of your result.
-
+We can confirm at the 95% confidence level that the proportion of mice that
+lived (while on the treatment) was between 0.337 and 0.460.
 
 # References
 
